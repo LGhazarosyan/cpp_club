@@ -5,6 +5,7 @@
 #ifndef LGHAZAROSYAN_VALUE_TRAITS_HPP
 #define LGHAZAROSYAN_VALUE_TRAITS_HPP
 
+#include <type_traits>
 
 namespace lghazarosyan{
 

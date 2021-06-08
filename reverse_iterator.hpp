@@ -5,22 +5,23 @@
 #ifndef LGHAZAROSYAN_REVERSE_ITERATOR_HPP
 #define LGHAZAROSYAN_REVERSE_ITERATOR_HPP
 #include <iostream>
+#include <iterator>
 #include "type_traits.hpp"
 #include "value_traits.hpp"
 
 namespace lghazarosyan{
-        template<class Iter, class unused = lghazarosyan::enable_if_t<lghazarosyan::is_base_of_v<std::bidirectional_iterator_tag, typename Iter::iterator_category>>>
+        template<class Iter, class unused = lghazarosyan::enable_if_t<lghazarosyan::is_base_of_v<std::bidirectional_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>>>
         class reverse_iterator {
         public:
             using iterator_type = Iter;
 
-            using reference = typename Iter::reference;
+            using reference = typename std::iterator_traits<Iter>::reference;
 
-            using pointer = typename Iter::pointer;
+            using pointer = typename std::iterator_traits<Iter>::pointer;
 
-            using iterator_category = typename Iter::iterator_category;
+            using iterator_category = typename std::iterator_traits<Iter>::iterator_category;
 
-            using difference_type = typename Iter::difference_type;
+            using difference_type = typename std::iterator_traits<Iter>::difference_type;
 
         public:
             reverse_iterator() = delete;
@@ -46,6 +47,8 @@ namespace lghazarosyan{
             reverse_iterator<Iter> operator=(const reverse_iterator<OtherIter> &);
 
             bool operator==(const reverse_iterator &other);
+
+            bool operator!=(const reverse_iterator &other);
 
             reference operator*() const;
 
@@ -98,7 +101,6 @@ namespace lghazarosyan{
         reverse_iterator<Iter, unused>::reverse_iterator(
                 const reverse_iterator<OtherIter> &other) {
             _iter = other._iter;
-            return *this;
         }
 
         template<class Iter, class unused>
@@ -106,7 +108,6 @@ namespace lghazarosyan{
         reverse_iterator<Iter> reverse_iterator<Iter, unused>::operator=(
                 const reverse_iterator<OtherIter> &other) {
             _iter = other._iter;
-            return *this;
         }
 
 
@@ -162,61 +163,66 @@ namespace lghazarosyan{
         }
 
         template<class Iter, class unused>
+        bool reverse_iterator<Iter, unused>::operator!=(const reverse_iterator &other) {
+            return !(*this == other);
+        }
+
+        template<class Iter, class unused>
         reverse_iterator<Iter, unused>
         reverse_iterator<Iter, unused>::operator[](difference_type index) {
-            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>){
+            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>){
                 return *this + index;
             }
             else{
-                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>,"Iterator must be random_access for operator []");
+                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>,"Iterator must be random_access for operator []");
             }
         }
 
         template<class Iter, class unused>
         reverse_iterator<Iter, unused> &
         reverse_iterator<Iter, unused>::operator-=(difference_type index) {
-            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>){
+            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>){
                 reverse_iterator<Iter>::_iter += index;
                 return *this;
             }
             else{
-                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>,"Iterator must be random_access for operator -=");
+                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>,"Iterator must be random_access for operator -=");
             }
         }
 
         template<class Iter, class unused>
         reverse_iterator<Iter, unused> &
         reverse_iterator<Iter, unused>::operator+=(difference_type index) {
-            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>){
+            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>){
                 reverse_iterator<Iter>::_iter -= index;
                 return *this;
             }
             else{
-                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>,"Iterator must be random_access for operator +=");
+                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>,"Iterator must be random_access for operator +=");
             }
         }
 
         template<class Iter, class unused>
         reverse_iterator<Iter, unused>
         reverse_iterator<Iter, unused>::operator-(difference_type index) const {
-            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>){
+            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>){
                 reverse_iterator copy = *this;
                 return copy -= index;
             }
             else{
-                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>,"Iterator must be random_access for operator -");
+                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>,"Iterator must be random_access for operator -");
             }
         }
 
         template<class Iter, class unused>
         reverse_iterator<Iter, unused>
         reverse_iterator<Iter, unused>::operator+(difference_type index) const {
-            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>){
+            if constexpr (lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>){
                 reverse_iterator copy = *this;
                 return copy += index;
             }
             else{
-                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename Iter::iterator_category>,"Iterator must be random_access for operator +");
+                static_assert(lghazarosyan::is_base_of_v<std::random_access_iterator_tag, typename std::iterator_traits<Iter>::iterator_category>,"Iterator must be random_access for operator +");
             }
         }
 

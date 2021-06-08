@@ -5,8 +5,9 @@
 #ifndef LGHAZAROSYAN_ARRAY_HPP
 #define LGHAZAROSYAN_ARRAY_HPP
 #include "reverse_iterator.hpp"
+#include "iterator_traits.hpp"
 
-#include "make_iterator_from_pointer.hpp"
+//TODO: add not default constructible value_type support
 namespace lghazarosyan{
     template<typename T, std::size_t N>
     class array{
@@ -19,8 +20,8 @@ namespace lghazarosyan{
         using const_reference = const value_type&;
         using pointer = value_type *;
         using const_pointer = const value_type *;
-        using iterator = details::wrap_pointer_to_iterator<pointer>;
-        using const_iterator = details::wrap_pointer_to_const_iterator<pointer>;
+        using iterator = pointer;
+        using const_iterator = const_pointer;
         using reverse_iterator = lghazarosyan::reverse_iterator<iterator>;
         using const_reverse_iterator = lghazarosyan::reverse_iterator<const_iterator>;
 
@@ -34,14 +35,14 @@ namespace lghazarosyan{
 
         constexpr array& operator = (const array&);
         constexpr array& operator = (array &&);
-        constexpr ~array() = default;
+        ~array() = default;
 
     public:
         constexpr const_reference operator [] (difference_type)const noexcept;
         constexpr reference operator [] (difference_type) noexcept;
 
         constexpr reference at(difference_type);
-        constexpr const_reference at(difference_type)const;
+        constexpr const_reference at(difference_type)const ;
 
         constexpr pointer data() noexcept;
         constexpr const_pointer data()const noexcept;
@@ -54,24 +55,24 @@ namespace lghazarosyan{
         constexpr reference  front() noexcept;
         constexpr const_reference front()const noexcept;
 
-        [[nodiscard]] constexpr bool empty()const;
-        constexpr size_type size()const;
-        constexpr size_type max_size()const;
+        [[nodiscard]] constexpr bool empty()const noexcept;
+        constexpr size_type size()const noexcept;
+        constexpr size_type max_size()const noexcept;
 
 
     public:
-        iterator begin();
-        const_iterator begin()const;
-        iterator end();
-        const_iterator end()const;
-        const_iterator cbegin()const;
-        const_iterator cend()const;
-        reverse_iterator rbegin();
-        const_reverse_iterator rbegin()const;
-        reverse_iterator rend();
-        const_reverse_iterator rend()const;
-        const_reverse_iterator crbegin()const;
-        const_reverse_iterator crend()const;
+        iterator begin() noexcept;
+        const_iterator begin()const noexcept;
+        iterator end() noexcept;
+        const_iterator end()const noexcept;
+        const_iterator cbegin()const noexcept ;
+        const_iterator cend()const noexcept;
+        reverse_iterator rbegin()noexcept;
+        const_reverse_iterator rbegin()const noexcept;
+        reverse_iterator rend()noexcept;
+        const_reverse_iterator rend()const noexcept;
+        const_reverse_iterator crbegin()const noexcept;
+        const_reverse_iterator crend()const noexcept;
 
 
     private:
@@ -141,77 +142,76 @@ namespace lghazarosyan{
     }
 
     template<typename T, std::size_t N>
-    constexpr bool array<T, N>::empty() const {
-        return N==0;
+    constexpr bool array<T, N>::empty() const noexcept {
+        return N == 0;
     }
 
     template<typename T, std::size_t N>
-    constexpr typename array<T,N>::size_type array<T, N>::size() const {
+    constexpr typename array<T,N>::size_type array<T, N>::size() const noexcept{
         return N;
     }
 
     template<typename T, std::size_t N>
-    constexpr typename array<T,N>::size_type array<T, N>::max_size() const {
-        return std::numeric_limits<size_type>::max();
+    constexpr typename array<T,N>::size_type array<T, N>::max_size() const noexcept{
+        return N;
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::iterator array<T, N>::begin() {
+    typename array<T,N>::iterator array<T, N>::begin() noexcept{
         return array::iterator(_arr);
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::const_iterator array<T, N>::begin()const {
+    typename array<T,N>::const_iterator array<T, N>::begin()const noexcept{
         return cbegin();
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::const_iterator array<T, N>::cbegin()const {
-        return array::const_iterator(_arr);//as I know , I will never attempt to change it's value , if it is really const
+    typename array<T,N>::const_iterator array<T, N>::cbegin()const noexcept{
+        return array::const_iterator(_arr);
     }
-
     template<typename T, std::size_t N>
-    typename array<T,N>::iterator array<T, N>::end() {
+    typename array<T,N>::iterator array<T, N>::end() noexcept{
         return array::iterator(_arr+N);
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::const_iterator array<T, N>::end()const {
+    typename array<T,N>::const_iterator array<T, N>::end()const noexcept {
         return cend();
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::const_iterator array<T, N>::cend()const {
+    typename array<T,N>::const_iterator array<T, N>::cend()const noexcept{
         return array::const_iterator(_arr);//as I know , I will never attempt to change it's value , if it is really const
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::reverse_iterator array<T, N>::rbegin() {
+    typename array<T,N>::reverse_iterator array<T, N>::rbegin() noexcept{
         return reverse_iterator(end());
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::const_reverse_iterator array<T, N>::rbegin()const{
+    typename array<T,N>::const_reverse_iterator array<T, N>::rbegin()const noexcept{
         return crbegin();
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::const_reverse_iterator array<T, N>::crbegin()const{
+    typename array<T,N>::const_reverse_iterator array<T, N>::crbegin()const noexcept{
         return const_reverse_iterator(cend());
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::reverse_iterator array<T, N>::rend() {
+    typename array<T,N>::reverse_iterator array<T, N>::rend() noexcept{
         return reverse_iterator(begin());
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::const_reverse_iterator array<T, N>::rend()const{
+    typename array<T,N>::const_reverse_iterator array<T, N>::rend()const noexcept{
         return crend();
     }
 
     template<typename T, std::size_t N>
-    typename array<T,N>::const_reverse_iterator array<T, N>::crend()const{
+    typename array<T,N>::const_reverse_iterator array<T, N>::crend()const noexcept{
         return const_reverse_iterator(cbegin());
     }
 
