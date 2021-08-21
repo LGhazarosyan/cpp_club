@@ -42,8 +42,8 @@ namespace lghazarosyan{
         optional& operator = (const nullopt_t& )noexcept(std::is_nothrow_destructible_v<value_type>);
 
         //this trick is for not calling this templated function indtead of move or copy assignment operator
-        template<class U, class = lghazarosyan::enable_if_t<std::is_assignable_v<T, U> && !lghazarosyan::is_same_v<std::decay_t<optional<T>>,std::decay_t<U>>>, class =  lghazarosyan::enable_if_t<!lghazarosyan::is_same_v<std::decay_t<optional<T>>, nullopt_t>>>
-        optional& operator = (U&&) noexcept(std::is_nothrow_assignable_v<T, U>);
+        template<class U, class = lghazarosyan::enable_if_t<std::is_assignable_v<value_type, U> && !lghazarosyan::is_same_v<std::decay_t<optional<value_type>>,std::decay_t<U>>>, class =  lghazarosyan::enable_if_t<!lghazarosyan::is_same_v<std::decay_t<optional<value_type>>, nullopt_t>>>
+        optional& operator = (U&&) noexcept(std::is_nothrow_assignable_v<value_type, U>);
 
         ~optional();
 
@@ -62,10 +62,10 @@ namespace lghazarosyan{
         const_rvalue_reference value()const&&;
 
         template <class U, class = lghazarosyan::enable_if_t<std::is_constructible_v<value_type, U>>>
-        value_type value_or(U&&)const & noexcept(std::is_nothrow_copy_constructible_v<T> && std::is_nothrow_assignable_v<value_type, U>);
+        value_type value_or(U&&)const & noexcept(std::is_nothrow_copy_constructible_v<value_type> && std::is_nothrow_assignable_v<value_type, U>);
 
         template <class U, class = lghazarosyan::enable_if_t<std::is_constructible_v<value_type, U>>>
-        value_type value_or(U&& value)&& noexcept(std::is_nothrow_move_constructible_v<T> && std::is_nothrow_assignable_v<value_type, U>);
+        value_type value_or(U&& value)&& noexcept(std::is_nothrow_move_constructible_v<value_type> && std::is_nothrow_assignable_v<value_type, U>);
 
         void reset()noexcept(std::is_nothrow_destructible_v<value_type>);
         template <class ...Ts, class = lghazarosyan::enable_if_t<std::is_constructible_v<value_type,Ts...>>>
@@ -97,14 +97,14 @@ namespace lghazarosyan{
     template<class T>
     optional<T>:: optional(const optional&other)noexcept(std::is_nothrow_copy_constructible_v<value_type>):_has_value(other._has_value){
         if(has_value()){
-            new(_ptr)T(*other);
+            new(_ptr)value_type(*other);
         }
     }
 
     template<class T>
     optional<T>::optional(optional&& other)noexcept(std::is_nothrow_move_constructible_v<value_type>):_has_value(other._has_value){
         if(has_value()){
-            new(_ptr)T(std::move(*other));
+            new(_ptr)value_type(std::move(*other));
         }
     }
 
@@ -120,7 +120,7 @@ namespace lghazarosyan{
     template<class T>
     optional<T>& optional<T>::operator =(const nullopt_t&)noexcept(std::is_nothrow_destructible_v<value_type>){
         if(has_value()){
-            ptr()->~T();
+            ptr()->~value_type();
         }
         _has_value = false;
         return *this;
@@ -130,9 +130,9 @@ namespace lghazarosyan{
     template<class U, class, class>
     optional<T>& optional<T>::operator = (U&& value) noexcept(std::is_nothrow_assignable_v<value_type, U>){
         if(has_value()){
-            ptr()->~T();
+            ptr()->~value_type();
         }
-        new(_ptr)T(std::forward<T>(value));
+        new(_ptr)value_type(std::forward<T>(value));
         _has_value = true;
         return *this;
     }
@@ -140,7 +140,7 @@ namespace lghazarosyan{
     template<class T>
     optional<T>::~optional(){
         if(_has_value){
-           ptr()->~T();
+           ptr()->~value_type();
         }
     }
 
@@ -209,7 +209,7 @@ namespace lghazarosyan{
 
     template<class T>
     template<class U, class>
-    typename optional<T>::value_type optional<T>::value_or(U&& value)const &noexcept(std::is_nothrow_copy_constructible_v<T> && std::is_nothrow_assignable_v<value_type, U>){
+    typename optional<T>::value_type optional<T>::value_or(U&& value)const &noexcept(std::is_nothrow_copy_constructible_v<value_type> && std::is_nothrow_assignable_v<value_type, U>){
         if(_has_value){
             return *ptr();
         }
@@ -218,7 +218,7 @@ namespace lghazarosyan{
 
     template<class T>
     template<class U, class>
-    typename optional<T>::value_type optional<T>::value_or(U&& value)&&noexcept(std::is_nothrow_move_constructible_v<T>&&std::is_nothrow_assignable_v<value_type, U>){
+    typename optional<T>::value_type optional<T>::value_or(U&& value)&&noexcept(std::is_nothrow_move_constructible_v<value_type>&&std::is_nothrow_assignable_v<value_type, U>){
         if(_has_value){
             _has_value = false;
             return std::move(*ptr());
@@ -229,7 +229,7 @@ namespace lghazarosyan{
     template<class T>
     void optional<T>::reset()noexcept(std::is_nothrow_destructible_v<value_type>){
         if(_has_value){
-            ptr()->~T();
+            ptr()->~value_type();
             _has_value = false;
         }
     }
@@ -238,14 +238,14 @@ namespace lghazarosyan{
     template<class ...Ts, class >
     void optional<T>::emplace(Ts&&...args)noexcept(std::is_nothrow_constructible_v<value_type, Ts...> && std::is_nothrow_destructible_v<value_type>){
         if(_has_value){
-            ptr()->~T();
+            ptr()->~value_type();
         }
-        new (_ptr)T(args...);
+        new (_ptr)value_type(args...);
         _has_value = true;
     }
 
     template<class T>
-    void optional<T>::swap(optional&other)noexcept(std::is_nothrow_move_constructible_v<T> && std::is_nothrow_destructible_v<T> && std::is_nothrow_swappable_v<T>){
+    void optional<T>::swap(optional&other)noexcept(std::is_nothrow_move_constructible_v<value_type> && std::is_nothrow_destructible_v<value_type> && std::is_nothrow_swappable_v<value_type>){
         using std::swap;
         swap(_has_value, other._has_value);
         if(!has_value() && !other.has_value()){
@@ -256,22 +256,22 @@ namespace lghazarosyan{
             return;
         }
         if(!has_value()){
-            new(other._ptr)T(std::move(*ptr()));
-            ptr()->~T();
+            new(other._ptr)value(std::move(*ptr()));
+            ptr()->~value_type();
             return;
         }
-        new(_ptr)T(std::move(*other.ptr()));
-        other.ptr()->~T();
+        new(_ptr)value_type(std::move(*other.ptr()));
+        other.ptr()->~value_type();
     }
 
     template <class T>
     typename optional<T>::const_pointer optional<T>::ptr()const noexcept{
-        return reinterpret_cast<const T*>(_ptr);
+        return reinterpret_cast<const value_type*>(_ptr);
     }
 
     template <class T>
     typename optional<T>::pointer optional<T>::ptr()noexcept{
-        return reinterpret_cast<T*>(_ptr);
+        return reinterpret_cast<value_type*>(_ptr);
     }
 
     template <class T>
@@ -301,7 +301,7 @@ namespace lghazarosyan{
 template<class T>
 class optional<T[]>;
 
-template<class T, class ...Ts, class = lghazarosyan::enable_if_t<std::is_constructible_v<T,Ts...>>>
+template<class T, class ...Ts, class = lghazarosyan::enable_if_t<std::is_constructible_v<T, Ts...>>>
 optional<T> make_optional(Ts...args){
     return optional<T>(args...);
 }
