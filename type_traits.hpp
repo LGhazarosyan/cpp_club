@@ -18,7 +18,6 @@ namespace lghazarosyan{
     template<bool condition,typename Type = void>
     using enable_if_t = typename enable_if<condition,Type>::type;
 
-
 }
 
 #endif //LGHAZAROSYAN_TYPE_TRAITS_HPP

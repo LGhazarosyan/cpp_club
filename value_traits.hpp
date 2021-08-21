@@ -20,7 +20,7 @@ namespace lghazarosyan{
     };
 
     template<typename T, typename U>
-    bool is_same_v = is_same<T,U>::value;
+    constexpr bool is_same_v = is_same<T,U>::value;
 
     struct true_type{
         static constexpr bool value = true;
@@ -45,6 +45,21 @@ namespace lghazarosyan{
 
     template<typename Base, typename Derived>
     constexpr bool is_base_of_v = is_base_of<Base,Derived>::value;
+
+    namespace details{
+    template <bool , class T, class ...Ts>
+    struct check_is_same_as_pack{
+        constexpr static bool value = lghazarosyan::is_same_v<std::decay_t<T>, typename std::decay<Ts...>::type>;
+    };
+
+    template <class T, class ...Ts>
+    struct check_is_same_as_pack<false , T, Ts...>:lghazarosyan::false_type{};
+    }
+
+    template<class T, class...Ts>
+    struct is_same_as_pack{
+        constexpr static bool value = details::check_is_same_as_pack<sizeof...(Ts) == 1, T, Ts...>::value;
+    };
 };
 
 #endif //LGHAZAROSYAN_VALUE_TRAITS_HPP
