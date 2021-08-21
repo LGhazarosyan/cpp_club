@@ -1,11 +1,14 @@
-#include <iostream>
+#include "array.hpp"
 #include "reverse_iterator.hpp"
+
+#include <iostream>
 #include <vector>
 #include <list>
 #include <algorithm>
 #include <forward_list>
-#include "array.hpp"
 #include <array>
+#include <gtest/gtest.h>
+
 class A{};
 
 class B: public A{};
@@ -17,8 +20,8 @@ class C{
     C(const C&) = delete;
     C(C&&) = delete;
 };
-int main(){
-    std::cout<<lghazarosyan::is_base_of_v<const A&,B>;
+
+TEST(TestArray, arrayTest){
     lghazarosyan::array<int ,5> arr = {1,2,3,4,5};
     for (const auto & i: arr){
         std::cout<<i<<std::endl;
@@ -63,6 +66,4 @@ int main(){
     *crit;
     rb[5];
     lghazarosyan::array<C, 6> arro;
-
-
 }
