@@ -43,6 +43,10 @@ TEST(TestOptional, testWithBuildInType){
     EXPECT_EQ(*opt3, 10);
     optional<int> opt4(opt3);
     EXPECT_EQ(opt3, opt4);
+    
+    auto opt5 = lghazarosyan::make_optional<float>(8.7);
+    opt4 = opt5;
+    EXPECT_EQ(*opt4, 8);
 
 }
 
@@ -79,4 +83,10 @@ TEST(TestOptional, testWithComplexType){
     EXPECT_EQ(optional<std::vector<int>>(std::initializer_list<int>{1,2,3,4,5,6}).value(), std::vector<int>({1,2,3,4,5,6}));
     EXPECT_EQ(optional<std::vector<int>>(std::initializer_list<int>{1,2,3,4,5,6}).value_or(std::initializer_list<int>{1,2,3,4}), std::vector<int>({1,2,3,4,5,6}));
     EXPECT_EQ(optional<std::vector<int>>().value_or(std::initializer_list<int>{1,2,3,4}), std::vector<int>({1,2,3,4}));
+
+    auto opt = lghazarosyan::make_optional<std::initializer_list<int>>(std::initializer_list<int>{1,2,3,4,5,6,7,8});
+    optVec4 = opt;
+    optional<std::vector<int>> optVec5 = opt;
+    EXPECT_EQ(*optVec4, std::vector<int>({1,2,3,4,5,6,7,8}));
+    EXPECT_EQ(optVec4, optVec5);
 }
