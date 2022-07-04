@@ -16,6 +16,19 @@ cc_test(
 )
 
 cc_test(
+    name = "test_tuple",
+    srcs = [
+        "test_tuple.cpp",
+    ],
+    deps = [
+        "//:standart",
+        "@gtest//:gtest_main",
+    ],
+    copts = COPTS,
+    linkopts = LOPTS,
+)
+
+cc_test(
     name = "test_optional",
     srcs = [
         "test_optional.cpp",
