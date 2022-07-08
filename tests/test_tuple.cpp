@@ -44,4 +44,13 @@ TEST(TestTuple, testTupleWithBuildInType){
     EXPECT_EQ(index3, 0);
     auto index4 = lghazarosyan::tuple_element_index_v<double, lghazarosyan::tuple<lghazarosyan::tuple<int, int, int>, lghazarosyan::tuple<int, int, int>, int, float>>;
     EXPECT_EQ(index4, static_cast<std::size_t>(-1));
+    auto newTup = lghazarosyan::make_tuple(4, 5, 4);
+    EXPECT_EQ(newTup, tup);
+    int first = 10;
+    int second = 20;
+    auto newTupTied = lghazarosyan::tie(first, second);
+    EXPECT_EQ(lghazarosyan::get<0>(newTupTied), 10);
+    first = 21;
+    EXPECT_EQ(lghazarosyan::get<0>(newTupTied), 21);
+
 }

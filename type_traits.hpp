@@ -6,27 +6,45 @@
 #define LGHAZAROSYAN_TYPE_TRAITS_HPP
 namespace lghazarosyan{
 
-    template<bool condition ,typename  Type = void>
-    struct enable_if{
-    };
+template<bool condition ,typename  Type = void>
+struct enable_if{
+};
 
-    template<class Type>
-    struct enable_if<true,Type>{
-        using type = Type;
-    };
+template<class Type>
+struct enable_if<true,Type>{
+    using type = Type;
+};
 
-    template<bool condition,typename Type = void>
-    using enable_if_t = typename enable_if<condition,Type>::type;
+template<bool condition,typename Type = void>
+using enable_if_t = typename enable_if<condition,Type>::type;
 
-    namespace details{
-    template< class, class T, class ...Ts>
-    struct first_type_of_pack_helper{
-        using type = T;
-    };
-    }
+namespace details{
+template< class, class T, class ...Ts>
+struct first_type_of_pack_helper{
+    using type = T;
+};
+}
 
-    template<class ...Ts>
-    struct first_type_of_pack: public details::first_type_of_pack_helper<lghazarosyan::enable_if_t<sizeof...(Ts) != 0>, Ts...>{};
+template<class ...Ts>
+struct first_type_of_pack: public details::first_type_of_pack_helper<lghazarosyan::enable_if_t<sizeof...(Ts) != 0>, Ts...>{};
+
+template<class T>
+struct remove_reference {
+    using type = T;
+};
+
+template<class T>
+struct remove_reference< T&> {
+    using type = T;
+};
+
+template<class T>
+struct remove_reference< T&&> {
+    using type = T;
+};
+
+template<class T>
+using remove_reference_t = typename remove_reference<T>::type;
 
 }
 

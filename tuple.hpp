@@ -15,13 +15,13 @@ template<class ...Ts>
 class tuple {
 private:
     template<class U, class ... UTs>
-    struct tuple_from_rest_types
+    struct tuple_from_RestTypes
     {
         using type = tuple<UTs...>;
     };
 
     using T = typename first_type_of_pack<Ts...>::type;
-    using rest_types = typename tuple_from_rest_types<Ts...>::type;
+    using RestTypes = typename tuple_from_RestTypes<Ts...>::type;
 public:
     tuple() = default;
     tuple(const tuple&) = default;
@@ -38,7 +38,7 @@ public:
 
 private:
     T _current;
-    rest_types _rest;
+    RestTypes _rest;
 
     template<std::size_t, typename ...UTs>
     friend auto get(const tuple<UTs...>&);
@@ -63,8 +63,8 @@ public:
 };
 
 template <class ...Ts>
-tuple<Ts...> make_tuple(Ts&&... args){
-    return tuple<std::remove_reference_t<Ts>...>(std::forward<Ts>(args)...);
+auto make_tuple(Ts&&... args){
+    return tuple<remove_reference_t<Ts>...>(std::forward<Ts>(args)...);
 }
 
 template <class ...Ts>
@@ -147,7 +147,7 @@ struct tuple_element;
 
 template<std::size_t Index, typename ...Ts>
 struct tuple_element<Index, tuple<Ts...>> {
-    using type = typename tuple_element<Index - 1, typename tuple<Ts...>::rest_types>::type;
+    using type = typename tuple_element<Index - 1, typename tuple<Ts...>::RestTypes>::type;
 };
 
 template<typename ...Ts>
@@ -173,7 +173,7 @@ namespace details {
 
 template <typename T, typename ...Ts, std::size_t Index>
 struct tuple_element_index_helper<T, tuple<Ts...>, Index> {
-    constexpr static std::size_t value = is_same_v<T, typename  tuple<Ts...>::T> ? Index : tuple_element_index_helper<T, typename tuple<Ts...>::rest_types, Index + 1>::value;
+    constexpr static std::size_t value = is_same_v<T, typename  tuple<Ts...>::T> ? Index : tuple_element_index_helper<T, typename tuple<Ts...>::RestTypes, Index + 1>::value;
 };
 
 template <typename T, std::size_t Index>
