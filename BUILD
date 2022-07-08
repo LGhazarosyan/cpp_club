@@ -11,6 +11,7 @@ cc_library(
         "value_traits.hpp",
         "iterator_traits.hpp",
         "optional.hpp",
+        "tuple.hpp"
     ],
     visibility = ["//visibility:public"],
     copts = COPTS,
