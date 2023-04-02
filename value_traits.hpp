@@ -7,7 +7,9 @@
 
 #include <type_traits>
 
-namespace lghazarosyan{
+namespace lghazarosyan {
+template <class T>
+T declval();
 
 template<typename T, typename U>
 struct is_same{
@@ -33,16 +35,20 @@ struct false_type{
 namespace details{
 
 template <typename T>
-false_type is_base_helper(void * );
+false_type is_base_helper_func(const volatile void * );
 
 template<typename T>
-true_type is_base_helper(T *);
+true_type is_base_helper_func(T *);
 
+template<class Base, class Derived>
+auto is_base_helper(int) -> decltype(is_base_helper_func<std::decay_t<Base>>(declval<Derived *>()));
+
+template<class Base, class Derived>
+true_type is_base_helper(long);
 }
+
 template<typename Base, typename Derived>
-struct is_base_of{
-    static constexpr bool value = decltype(details::is_base_helper<std::decay_t<Base>>(std::declval<std::decay_t<Derived>*>()))::value;
-};
+struct is_base_of: decltype(details::is_base_helper<Base, Derived>(0)){};
 
 template<typename Base, typename Derived>
 constexpr bool is_base_of_v = is_base_of<Base,Derived>::value;
@@ -61,6 +67,6 @@ template<class T, class...Ts>
 struct is_same_as_pack{
     constexpr static bool value = details::check_is_same_as_pack<sizeof...(Ts) == 1, T, Ts...>::value;
 };
-}
 
+} //namespace lghazarosyan
 #endif //LGHAZAROSYAN_VALUE_TRAITS_HPP
