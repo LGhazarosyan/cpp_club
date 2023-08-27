@@ -41,10 +41,51 @@ cc_test(
     linkopts = LOPTS,
 )
 
+cc_test(
+    name = "test_reverse_iterator",
+    srcs = [
+        "test_reverse_iterator.cpp",
+    ],
+    deps = [
+        "//:standart",
+        "@gtest//:gtest_main",
+    ],
+    copts = COPTS,
+    linkopts = LOPTS,
+)
+
+cc_test(
+    name = "test_traits",
+    srcs = [
+        "test_traits.cpp",
+    ],
+    deps = [
+        "//:standart",
+        "@gtest//:gtest_main",
+    ],
+    copts = COPTS,
+    linkopts = LOPTS,
+)
+
+cc_test(
+    name = "test_unique",
+    srcs = [
+        "test_unique_ptr.cpp",
+    ],
+    deps = [
+        "//:standart",
+        "@gtest//:gtest_main",
+    ],
+    copts = COPTS,
+    linkopts = LOPTS,
+)
+
 test_suite(
     name = "standart_tests",
     tests = [
     "test_array",
     "test_optional",
+	"test_traits",
+	"test_unique",
     ],
 );
