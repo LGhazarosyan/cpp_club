@@ -24,13 +24,14 @@ struct is_same<T,T>{
 template<typename T, typename U>
 constexpr bool is_same_v = is_same<T,U>::value;
 
-struct true_type{
-    static constexpr bool value = true;
+template<bool val>
+struct bool_constant {
+	static constexpr bool value = val;
 };
 
-struct false_type{
-    static constexpr bool value = false;
-};
+struct true_type : bool_constant<true>{};
+
+struct false_type : bool_constant<false>{};
 
 namespace details{
 

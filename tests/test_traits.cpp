@@ -38,14 +38,46 @@ TEST(TestValueTraits, testCallable) {
 }
 
 class A {};
-class B : public A{};
-class C : private A{};
+class E : public A {
+public:
+	E()=default;
+private:
+	E(const E&);
+	E(E&&);
+};
+class C : private A {};
+class B : public A {
+public:
+	B(const A &);
+private:
+	B(const C &) {};
+};
 class D : protected A {};
+
 
 TEST(TestValueTraits, testIsBase) {
 	EXPECT_FALSE( (is_base_of_v<int, float>) );
 	EXPECT_TRUE( (is_base_of_v<A, B>) );
 	EXPECT_TRUE( (is_base_of_v<A, C>) );
 	EXPECT_TRUE( (is_base_of_v<A, D>) );
-} 
+}
+
+
+TEST(TestValueTraits, testIsConstructible) {
+	EXPECT_TRUE( (is_constructible_v<A>) );
+	EXPECT_FALSE( (is_constructible_v<A, int>) );
+	EXPECT_FALSE( (is_constructible_v<B, C>) );
+
+	EXPECT_TRUE( (is_constructible_v<B, A>) );
+	EXPECT_TRUE( (is_constructible_v<B, E>) );
+	EXPECT_TRUE( (is_constructible_v<int, long>) );
+	EXPECT_TRUE( (is_constructible_v<B*, A*>) );
+	EXPECT_FALSE( (is_constructible_v<C*, A*>) );
+
+	EXPECT_FALSE( (is_constructible_v<E, E>) );
+	EXPECT_TRUE( (is_constructible_v<E*, E*>) );
+	EXPECT_TRUE( (is_constructible_v<E&, E&>) );
+
+	EXPECT_FALSE( (is_constructible_v<C&, A&>) );
+}
 
